@@ -1,0 +1,13 @@
+# Nodejs server
+FROM node:18-alpine
+
+WORKDIR /app
+
+ENV PATH /app/node_modules/.bin:$PATH
+
+COPY . /app
+
+RUN npm ci --loglevel verbose
+
+CMD [ "node", "index.js" ]
+

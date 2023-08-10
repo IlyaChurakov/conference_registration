@@ -1,0 +1,17 @@
+version: '3'
+services:
+  app:
+    container_name: conf_app
+    restart: always
+    build: ./app
+    image: 'conf_app'
+    ports:
+      - 80:80
+      - 443:443
+  api:
+    container_name: conf_api
+    restart: always
+    build: ./api
+    image: 'conf_api'
+    ports:
+      - 3000:3000

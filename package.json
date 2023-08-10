@@ -1,0 +1,10 @@
+{
+	"scripts": {
+		"dev": "concurrently -c white,yellow -n api,app npm:watch-api npm:watch-app",
+		"watch-api": "cd api && npm run dev",
+		"watch-app": "cd app && npm run dev"
+	},
+	"dependencies": {
+		"concurrently": "^8.2.0"
+	}
+}
