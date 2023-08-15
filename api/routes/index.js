@@ -19,20 +19,73 @@ router.post('/login', (req, res) => {
 })
 
 // Ошибка где-то тут
+// router.post('/createPDF', (req, res) => {
+// 	const { pdfName } = req.body
+
+// 	pdf
+// 		.create(pdfTemplate(req.body), {})
+// 		.toFile(`${__dirname}/${pdfName}.pdf`, err => {
+// 			if (err) {
+// 				console.log(err)
+// 				res.send(Promise.reject())
+// 			} else {
+// 				res.send(Promise.resolve())
+// 			}
+// 		})
+// })
+
+const PDFDocument = require('pdfkit')
+const fs = require('fs')
+const path = require('path')
+
 router.post('/createPDF', (req, res) => {
-	const { pdfName } = req.body
+	const { pdfName, name, fio, phone, post, format, role, options } = req.body
+	const pdfFilePath = path.join(__dirname, `${pdfName}.pdf`)
+	const today = new Date()
 
-	console.log('start')
+	const doc = new PDFDocument()
+	doc.pipe(fs.createWriteStream(pdfFilePath))
 
-	pdf
-		.create(pdfTemplate(req.body), {})
-		.toFile(`${__dirname}/${pdfName}.pdf`, err => {
-			// Возможно дважды отрабатывает эта штука
-			if (err) {
-				res.send(Promise.reject())
-			}
-			res.send(Promise.resolve())
-		})
+	// Добавьте здесь ваш код для создания содержимого PDF
+	doc
+		.font(
+			path.join(
+				__dirname,
+				'../documents/Shentox-Regular (RUS by Slavchansky)_0.ttf'
+			)
+		)
+		.fontSize(10)
+		.image('./images/v915-wit-011-f.jpg', 0, 0, { width: 612, height: 792 })
+		.image('./images/logo.png', 50, 50, { width: 200, height: 50 })
+		.text(
+			`Дата регистрации: ${`${today.getDate()}. ${
+				(today.getMonth() + 1).length == 1
+					? today.getMonth() + 1
+					: '0' + (today.getMonth() + 1)
+			}. ${today.getFullYear()}.`}`,
+			70,
+			150
+		)
+		.moveDown(1)
+		.text(`Благодарим за регистрацию на конференцию!`)
+		.moveDown(1)
+		.rect(50, 200, 500, 120)
+		.stroke()
+		.moveDown(1)
+		.text(`Организация: ${name}`)
+		.moveDown(0.5)
+		.text(`Участник: ${fio}`)
+		.moveDown(0.5)
+		.text(`Должность: ${post}`)
+		.moveDown(0.5)
+		.text(`Телефон: ${phone}`)
+		.moveDown(0.5)
+		.text(`Формат участия: ${format}`)
+		.moveDown(0.5)
+		.text(`В роли: ${role}`)
+	doc.end()
+
+	res.status(200).send({ message: 'PDF успешно создан' })
 })
 
 router.get('/fetchPDF/:pdfName', (req, res) => {

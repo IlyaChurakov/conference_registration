@@ -6,7 +6,11 @@ const cors = require('cors')
 
 const app = express()
 
-const allowedOrigins = ['http://localhost:5173', 'https://localhost']
+const allowedOrigins = [
+	'http://localhost:5173',
+	'https://localhost',
+	'https://172.16.0.168',
+]
 
 app.use(
 	cors({

@@ -1,7 +1,7 @@
 import React, { memo } from 'react'
 import './style.scss'
 
-const Input = ({ type, placeholder, style, onChange }) => {
+const Input = ({ type, placeholder, style, onChange, required }) => {
 	return (
 		<input
 			className='input'

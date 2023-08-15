@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import './app.scss'
 import ErrorPage from './features/pages/error-page'
-import Form from './features/pages/form'
+import FormikForm from './features/pages/formik'
 import Main from './features/pages/main'
 import Thanks from './features/pages/thanks'
 
@@ -9,7 +9,7 @@ function App() {
 	return (
 		<Routes>
 			<Route path={'/'} element={<Main />} />
-			<Route path={'/form'} element={<Form />} />
+			<Route path={'/formik'} element={<FormikForm />} />
 			<Route path={'/thanks/:email/:pdfName'} element={<Thanks />} />
 			<Route path={'/error'} element={<ErrorPage />} />
 
