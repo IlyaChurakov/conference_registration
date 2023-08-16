@@ -4,8 +4,33 @@ const sqlite3 = require('sqlite3').verbose()
 const router = new Router()
 const jwt = require('jsonwebtoken')
 const authMiddleware = require('../middleware/AuthMiddleware')
-const pdf = require('html-pdf')
-const pdfTemplate = require('../documents/index')
+
+const QRCode = require('qrcode')
+const fs = require('fs')
+
+router.post('/qr', async (req, res) => {
+	const { text } = req.body
+
+	// Создаем QR-код
+	QRCode.toDataURL(text, async (err, url) => {
+		if (err) throw err
+
+		// Сохраняем изображение с QR-кодом
+		const qrCodeImagePath = `${__dirname}/qrcode_${text}.png`
+		const base64Data = url.replace(/^data:image\/png;base64/, '')
+		fs.writeFileSync(qrCodeImagePath, base64Data, 'base64')
+
+		console.log('QR-код успешно создан и сохранен:', qrCodeImagePath)
+	})
+
+	res.send('QRcode created')
+})
+
+router.get('/qr', (req, res) => {
+	const { text } = req.body
+
+	res.sendFile(`${__dirname}/qrcode_${text}.png`)
+})
 
 router.post('/login', (req, res) => {
 	const { username, password } = req.body
@@ -18,32 +43,20 @@ router.post('/login', (req, res) => {
 	}
 })
 
-// Ошибка где-то тут
-// router.post('/createPDF', (req, res) => {
-// 	const { pdfName } = req.body
-
-// 	pdf
-// 		.create(pdfTemplate(req.body), {})
-// 		.toFile(`${__dirname}/${pdfName}.pdf`, err => {
-// 			if (err) {
-// 				console.log(err)
-// 				res.send(Promise.reject())
-// 			} else {
-// 				res.send(Promise.resolve())
-// 			}
-// 		})
-// })
-
 const PDFDocument = require('pdfkit')
-const fs = require('fs')
 const path = require('path')
 
 router.post('/createPDF', (req, res) => {
-	const { pdfName, name, fio, phone, post, format, role, options } = req.body
+	const { pdfName, name, fio, phone, post, format, role, theme, qrcodeTime } =
+		req.body
 	const pdfFilePath = path.join(__dirname, `${pdfName}.pdf`)
 	const today = new Date()
 
-	const doc = new PDFDocument()
+	const doc = new PDFDocument({
+		size: 'A5',
+		margin: 40, // Отступы по краям страницы
+		layout: 'landscape',
+	})
 	doc.pipe(fs.createWriteStream(pdfFilePath))
 
 	// Добавьте здесь ваш код для создания содержимого PDF
@@ -57,19 +70,17 @@ router.post('/createPDF', (req, res) => {
 		.fontSize(10)
 		.image('./images/v915-wit-011-f.jpg', 0, 0, { width: 612, height: 792 })
 		.image('./images/logo.png', 50, 50, { width: 200, height: 50 })
+		.image(`./routes/qrcode_${qrcodeTime}.png`, 400, 50, {
+			width: 100,
+			height: 100,
+		})
 		.text(
-			`Дата регистрации: ${`${today.getDate()}. ${
-				(today.getMonth() + 1).length == 1
-					? today.getMonth() + 1
-					: '0' + (today.getMonth() + 1)
-			}. ${today.getFullYear()}.`}`,
+			`Приглашение на конференцию «Содействие развитию систем управления качеством, метрологии и стандартизации организаций промышленности Государственной корпорации «Ростех»`,
 			70,
-			150
+			160
 		)
 		.moveDown(1)
-		.text(`Благодарим за регистрацию на конференцию!`)
-		.moveDown(1)
-		.rect(50, 200, 500, 120)
+		.rect(50, 200, 500, 140)
 		.stroke()
 		.moveDown(1)
 		.text(`Организация: ${name}`)
@@ -83,6 +94,8 @@ router.post('/createPDF', (req, res) => {
 		.text(`Формат участия: ${format}`)
 		.moveDown(0.5)
 		.text(`В роли: ${role}`)
+		.moveDown(0.5)
+		.text(`Тема доклада: ${theme}`)
 	doc.end()
 
 	res.status(200).send({ message: 'PDF успешно создан' })
@@ -92,6 +105,10 @@ router.get('/fetchPDF/:pdfName', (req, res) => {
 	const { pdfName } = req.params
 
 	res.sendFile(`${__dirname}/${pdfName}.pdf`)
+})
+router.get('/fetchPolicy', (req, res) => {
+	const filePath = path.join(__dirname, '..', 'documents', 'Policy.pdf')
+	res.sendFile(filePath)
 })
 
 router.post('/sendemail', (req, res) => {
@@ -136,14 +153,15 @@ router.post('/sendemail', (req, res) => {
 	})
 })
 router.post('/database', (req, res) => {
-	const { name, fio, post, contacts, format, role, theme, options } = req.body
+	const { name, fio, post, phone, email, format, role, theme, options, text } =
+		req.body
 
 	const db = new sqlite3.Database('./ex_visitors.db')
 
 	try {
 		db.all(
-			`INSERT INTO visitors VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-			[name, fio, post, contacts, format, role, theme, options],
+			`INSERT INTO qr_visitors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP) on conflict do nothing`,
+			[name, fio, text, post, phone, email, format, role, theme, options],
 			(err, rows) => {
 				if (err) {
 					res.status(500).send('Ошибка сервера, данные в БД не записаны')
@@ -161,7 +179,7 @@ router.post('/database', (req, res) => {
 router.get('/database', authMiddleware, (req, res) => {
 	const db = new sqlite3.Database('./ex_visitors.db')
 
-	db.all(`select * from visitors v`, (err, rows) => {
+	db.all(`select * from qr_visitors v`, (err, rows) => {
 		if (err) {
 			console.error(err)
 			res.status(500).send('Ошибка сервера, не удалось получить данные из БД')

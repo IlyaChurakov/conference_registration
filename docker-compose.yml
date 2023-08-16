@@ -15,3 +15,5 @@ services:
     image: 'conf_api'
     ports:
       - 3000:3000
+    volumes:
+      - ./db/ex_visitors.db:/app/ex_visitors.db
