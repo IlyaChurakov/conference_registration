@@ -8,7 +8,7 @@ const authMiddleware = require('../middleware/AuthMiddleware')
 const QRCode = require('qrcode')
 const fs = require('fs')
 
-router.post('/qr', async (req, res) => {
+router.post('/qr', authMiddleware, async (req, res) => {
 	const { text } = req.body
 
 	// Создаем QR-код
@@ -26,7 +26,7 @@ router.post('/qr', async (req, res) => {
 	res.send('QRcode created')
 })
 
-router.get('/qr', (req, res) => {
+router.get('/qr', authMiddleware, (req, res) => {
 	const { text } = req.body
 
 	res.sendFile(`${__dirname}/qrcode_${text}.png`)
@@ -46,73 +46,100 @@ router.post('/login', (req, res) => {
 const PDFDocument = require('pdfkit')
 const path = require('path')
 
-router.post('/createPDF', (req, res) => {
-	const { pdfName, name, fio, phone, post, format, role, theme, qrcodeTime } =
-		req.body
+router.post('/createPDF', authMiddleware, (req, res) => {
+	const {
+		pdfName,
+		name,
+		fio,
+		phone,
+		post,
+		format,
+		role,
+		theme,
+		qrcodeTime,
+		options,
+	} = req.body
 	const pdfFilePath = path.join(__dirname, `${pdfName}.pdf`)
 	const today = new Date()
 
 	const doc = new PDFDocument({
 		size: 'A5',
-		margin: 40, // Отступы по краям страницы
-		layout: 'landscape',
+		margin: 0, // Отступы по краям страницы
+		// layout: 'landscape',
 	})
 	doc.pipe(fs.createWriteStream(pdfFilePath))
 
 	// Добавьте здесь ваш код для создания содержимого PDF
 	doc
 		.font(
-			path.join(
-				__dirname,
-				'../documents/Shentox-Regular (RUS by Slavchansky)_0.ttf'
-			)
+			path.join(__dirname, '../documents/Proxima Nova Condensed Regular.otf')
 		)
-		.fontSize(10)
-		.image('./images/v915-wit-011-f.jpg', 0, 0, { width: 612, height: 792 })
-		.image('./images/logo.png', 50, 50, { width: 200, height: 50 })
-		.image(`./routes/qrcode_${qrcodeTime}.png`, 400, 50, {
+		.fontSize(12)
+		.image('./images/background.jpg', 0, 0, { width: 612, height: 792 })
+		.image('./images/rttech_dark.png', 80, 30, { width: 50, height: 50 })
+		.image('./images/rostech_dark.png', 20, 30, { width: 50, height: 50 })
+		.image(`./routes/qrcode_${qrcodeTime}.png`, 300, 25, {
 			width: 100,
 			height: 100,
 		})
+		.fillColor('black')
+		.text(`Заявка на конференцию `, 20, 100, {
+			width: 250,
+			height: 20,
+		})
+		.fontSize(10)
+		.moveDown(0.5)
 		.text(
-			`Приглашение на конференцию «Содействие развитию систем управления качеством, метрологии и стандартизации организаций промышленности Государственной корпорации «Ростех»`,
-			70,
-			160
+			`Содействие развитию систем управления качеством, метрологии и стандартизации организаций промышленности Государственной корпорации «Ростех»`,
+			{
+				width: 250,
+				height: 50,
+			}
 		)
 		.moveDown(1)
-		.rect(50, 200, 500, 140)
+		.rect(10, 170, 400, 415)
+		.strokeColor('black')
 		.stroke()
 		.moveDown(1)
-		.text(`Организация: ${name}`)
-		.moveDown(0.5)
-		.text(`Участник: ${fio}`)
-		.moveDown(0.5)
-		.text(`Должность: ${post}`)
-		.moveDown(0.5)
-		.text(`Телефон: ${phone}`)
-		.moveDown(0.5)
-		.text(`Формат участия: ${format}`)
-		.moveDown(0.5)
-		.text(`В роли: ${role}`)
-		.moveDown(0.5)
-		.text(`Тема доклада: ${theme}`)
+
+	name && doc.text(`Организация: ${name}`).moveDown(0.5)
+	fio && doc.text(`Участник: ${fio}`).moveDown(0.5)
+	post && doc.text(`Должность: ${post}`).moveDown(0.5)
+	phone && doc.text(`Телефон: ${phone}`).moveDown(0.5)
+	format && doc.text(`Формат участия: ${format}`).moveDown(0.5)
+	role && doc.text(`В роли: ${role}`).moveDown(0.5)
+
+	theme && doc.text(`Тема доклада: ${theme}`).moveDown(0.5)
+
+	options && options.length && doc.text(`Интересные темы:`)
+
+	options &&
+		options.forEach(opt => {
+			doc.fontSize(8).text(`- ${opt.slice(0, 90)}...`, {
+				width: 380,
+				height: 50,
+			})
+		})
+
 	doc.end()
 
-	res.status(200).send({ message: 'PDF успешно создан' })
+	res.status(200).send('PDF успешно создан')
 })
 
-router.get('/fetchPDF/:pdfName', (req, res) => {
+router.get('/fetchPDF/:pdfName', authMiddleware, (req, res) => {
 	const { pdfName } = req.params
 
-	res.sendFile(`${__dirname}/${pdfName}.pdf`)
+	res.setHeader('Content-Type', 'application/pdf')
+
+	res.sendFile(`${__dirname}/${pdfName}`)
 })
 router.get('/fetchPolicy', (req, res) => {
 	const filePath = path.join(__dirname, '..', 'documents', 'Policy.pdf')
 	res.sendFile(filePath)
 })
 
-router.post('/sendemail', (req, res) => {
-	const { email, pdfName } = req.body
+router.post('/sendemail', authMiddleware, (req, res) => {
+	const { fio, email, pdfName } = req.body
 	// Настройка транспорта для отправки письма (указать свои настройки SMTP)
 
 	const transporter = nodemailer.createTransport({
@@ -120,14 +147,14 @@ router.post('/sendemail', (req, res) => {
 		port: 465, // Порт SMTP сервера
 		secure: true, // Использовать ли SSL/TLS (true для 465, false для других портов)
 		auth: {
-			user: 'churakov018@mail.ru', // Замените на ваше имя пользователя SMTP
-			pass: '9J5YPUgkxvzUNDtHtzFq', // Замените на ваш пароль SMTP
+			user: 'no-replay@rt-techpriemka.ru', // Замените на ваше имя пользователя SMTP
+			pass: 'ku1YpQSZ67vW1Z2C69bh', // Замените на ваш пароль SMTP
 		},
 	})
 
 	// Настройка содержания письма
 	const mailOptions = {
-		from: 'churakov018@mail.ru', // Замените на ваш email
+		from: 'no-replay@rt-techpriemka.ru', // Замените на ваш email
 		to: `${email}, d.kondratenko@rt-techpriemka.ru`, // Замените на email получателя
 		subject: 'Регистрация на конференцию',
 		attachments: [
@@ -136,9 +163,16 @@ router.post('/sendemail', (req, res) => {
 				path: `${__dirname}/${pdfName}.pdf`, // Путь к файлу на сервере
 			},
 		],
-		text: `
-			Спасибо за регистрацию на конференцию
-		`,
+		html: `
+			<div>
+				<div>Здравствуйте, ${fio}!</div>
+				<p>Спасибо за регистрацию на конференцию «Содействие развитию систем управления качеством, метрологии и стандартизации организаций промышленности Государственной корпорации «Ростех».</p>
+				<p>Мы будем рады видеть Вас <strong> 10-13 октября 2023 года </strong> в городе <strong>Сочи</strong>.</p>
+				<p>За несколько дней до конференции Вам придет письмо с напоминанием.</p>
+				<p>Пожалуйста, не забудьте приглашение, вложенное в письмо. Его можно не распечатывать, а сохранить в телефоне: оно понадобится для оформления бейджа участника.</p>
+				<p>Не прощаемся и ждем Вас в Сочи!</p>
+				<p><i>АО «РТ-Техприемка»</i></p>
+			</div>`,
 	}
 
 	// Отправка письма
@@ -152,7 +186,7 @@ router.post('/sendemail', (req, res) => {
 		}
 	})
 })
-router.post('/database', (req, res) => {
+router.post('/database', authMiddleware, (req, res) => {
 	const { name, fio, post, phone, email, format, role, theme, options, text } =
 		req.body
 

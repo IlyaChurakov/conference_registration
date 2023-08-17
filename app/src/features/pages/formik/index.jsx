@@ -148,7 +148,6 @@ const FormikForm = () => {
 
 	const sendForm = async values => {
 		console.log('Отправка данных')
-
 		setLoading(true)
 
 		const today = new Date()
@@ -170,7 +169,6 @@ const FormikForm = () => {
 			}.${today.getFullYear()}`}`,
 		}
 
-		console.log(data)
 		// Формируем QRcode
 		await fetch(
 			`${import.meta.env.VITE_SERVER_PROTOCOL}://${
@@ -181,18 +179,23 @@ const FormikForm = () => {
 				headers: {
 					Accept: 'application/json',
 					'Content-Type': 'application/json',
+					Authorization: `${import.meta.env.VITE_TOKEN}`,
 				},
 				body: JSON.stringify(data),
 			}
 		)
 			.then(res => {
-				return res.text()
+				if (res.status >= 200 && res.status <= 226) {
+					console.log('QRcode сформирован')
+					return res.text()
+				} else {
+					throw new Error(`${res.status}: ${res.statusText}`)
+				}
 			})
-			.then(() => console.log('QRcode сформирован'))
-			.catch(() => {
+			.catch(err => {
 				setLoading(false)
-				navigate('/error')
-				throw new Error('Ошибка формирования qrcode')
+				navigate(`/error/${err ? err : 'Неизвестная ошибка'}`)
+				throw new Error(err)
 			})
 
 		// Записываем данные в БД
@@ -205,22 +208,23 @@ const FormikForm = () => {
 				headers: {
 					Accept: 'application/json',
 					'Content-Type': 'application/json',
+					Authorization: `${import.meta.env.VITE_TOKEN}`,
 				},
 				body: JSON.stringify(data),
 			}
 		)
 			.then(res => {
-				if (res.status == 504) {
+				if (res.status >= 200 && res.status <= 226) {
+					console.log('Данные занесены в базу')
 					return res.text()
 				} else {
-					return res.json()
+					throw new Error(`${res.status}: ${res.statusText}`)
 				}
 			})
-			.then(() => console.log('Данные успешно занесены в БД'))
-			.catch(() => {
+			.catch(err => {
 				setLoading(false)
-				navigate('/error')
-				throw new Error('Ошибка при занесении данных в БД')
+				navigate(`/error/${err ? err : 'Неизвестная ошибка'}`)
+				throw new Error(err)
 			})
 
 		// Формируем PDF
@@ -233,21 +237,23 @@ const FormikForm = () => {
 				headers: {
 					Accept: 'application/json',
 					'Content-Type': 'application/json',
+					Authorization: `${import.meta.env.VITE_TOKEN}`,
 				},
 				body: JSON.stringify({ ...data, qrcodeTime: hash }),
 			}
 		)
 			.then(res => {
-				return res.text()
-			})
-			.then(() => {
-				console.log('PDF сформирован')
+				if (res.status >= 200 && res.status <= 226) {
+					console.log('PDF сформирован')
+					return res.text()
+				} else {
+					throw new Error(`${res.status}: ${res.statusText}`)
+				}
 			})
 			.catch(err => {
-				console.log(err)
 				setLoading(false)
-				navigate('/error')
-				throw new Error('Ошибка при формировании PDF')
+				navigate(`/error/${err ? err : 'Неизвестная ошибка'}`)
+				throw new Error(err)
 			})
 
 		await fetch(
@@ -259,53 +265,36 @@ const FormikForm = () => {
 				headers: {
 					Accept: 'application/json',
 					'Content-Type': 'application/json',
+					Authorization: `${import.meta.env.VITE_TOKEN}`,
 				},
 				body: JSON.stringify(data),
 			}
 		)
 			.then(res => {
-				console.log('Сообщение на почту отправлено')
-				setLoading(false)
-				navigate(`/thanks/${values.email}/${data.pdfName}`)
-				return res.text()
+				// Обрабатываем только успешные ответы
+				if (res.status >= 200 && res.status <= 226) {
+					console.log('Письмо на почту отправлено')
+					// Убираем лоадер
+					setLoading(false)
+					// Перенаправляем на страницу благодарности
+					navigate(`/thanks/${data.email}/${data.pdfName}`)
+					// Возвращаем текстовый ответ, поскольку приходит тоже текст
+					return res.text()
+				} else {
+					// Выкидываем ошибку с текстом, чтобы отработал блок catch
+					throw new Error(`${res.status}: ${res.statusText}`)
+				}
 			})
 			.catch(err => {
 				console.log(err)
+				// Также убираем лоадер
 				setLoading(false)
-				navigate('/error')
-				throw new Error('Ошибка при отправке письма на почту')
+				// Перенаправляем на страницу ошибки
+				navigate(`/error/${err ? err : 'Неизвестная ошибка'}`)
+				// Выкидываем ошибку
+				throw new Error(err)
 			})
 	}
-
-	// const validate = values => {
-	// 	const errors = {}
-
-	// 	// Проверяем, что поля заполнены
-	// 	if (!values.name) {
-	// 		errors.name = 'Поле обязательно для заполнения'
-	// 		errors.button = 'Не все поля заполнены'
-	// 	}
-	// 	if (!values.fio) {
-	// 		errors.fio = 'Поле обязательно для заполнения'
-	// 	}
-	// 	if (!values.post) {
-	// 		errors.post = 'Поле обязательно для заполнения'
-	// 	}
-	// 	if (!values.phone) {
-	// 		errors.phone = 'Поле обязательно для заполнения'
-	// 	}
-	// 	if (!values.email) {
-	// 		errors.email = 'Поле обязательно для заполнения'
-	// 	}
-	// 	if (!values.format) {
-	// 		errors.format = 'Поле обязательно для заполнения'
-	// 	}
-	// 	if (!values.role) {
-	// 		errors.role = 'Поле обязательно для заполнения'
-	// 	}
-
-	// 	return errors
-	// }
 
 	const validationSchema = Yup.object({
 		policy: Yup.string().required('Невозможно продолжить без согласия'),
@@ -324,12 +313,13 @@ const FormikForm = () => {
 		post: Yup.string().required('Введите должность участника'),
 		phone: Yup.string()
 			.matches(
-				/8\d{3}\d{3}\d{4}$/,
-				'Введите номер в формате 89991112233 (без пробелов, начиная с 8)'
+				/^[0-9() -+]+$/,
+				'Допустимые символы номера телефона: 0-9 ( ) - +'
 			)
 			.required('Введите номер телефона'),
 		format: Yup.string().required('Выберите формат участия'),
 		role: Yup.string().required('Выберите роль участника'),
+		metrology: Yup.string().required('Укажите участие'),
 	})
 
 	return (
@@ -358,12 +348,12 @@ const FormikForm = () => {
 							theme: '',
 							selectedItems: [],
 							policy: false,
+							metrology: '',
 						}}
 						validationSchema={validationSchema}
 						onSubmit={async values => {
 							await sendForm(values)
 						}}
-						// validate={validate}
 					>
 						{({ isSubmitting, values, setFieldValue }) => (
 							<Form className='form'>
@@ -387,7 +377,7 @@ const FormikForm = () => {
 										<Field
 											id='name'
 											name='name'
-											placeholder='АО Пример'
+											placeholder='АО РТ-Техприемка'
 											className='form__input'
 										/>
 									</div>
@@ -404,7 +394,7 @@ const FormikForm = () => {
 										<Field
 											id='fio'
 											name='fio'
-											placeholder='Примеров Пример Примерович'
+											placeholder='Иванов Иван Иванович'
 											className='form__input'
 										/>
 									</div>
@@ -421,7 +411,7 @@ const FormikForm = () => {
 										<Field
 											id='post'
 											name='post'
-											placeholder='Ведущий пример по примерке примеров'
+											placeholder='Директор по качеству'
 											type='text'
 											className='form__input'
 										/>
@@ -475,7 +465,7 @@ const FormikForm = () => {
 										<Field as='select' name='format' className='form__input'>
 											<option value=''>Выбрать</option>
 											<option value='Очно'>Очно</option>
-											<option value='Заочно'>Заочно</option>
+											<option value='Заочно'>Заочно (ВКС)</option>
 										</Field>
 									</div>
 
@@ -496,7 +486,7 @@ const FormikForm = () => {
 									</div>
 
 									{values.role === 'С докладом' && (
-										<div>
+										<div style={{ gridColumn: '1 / 3' }}>
 											<label htmlFor='theme' className='form__label'>
 												Тема доклада
 											</label>
@@ -509,7 +499,26 @@ const FormikForm = () => {
 											/>
 										</div>
 									)}
+
+									<div style={{ gridColumn: '1 / 3' }}>
+										<label htmlFor='metrology' className='form__label'>
+											Участие в Совете главных метрологов организаций ГК
+											«Ростех»
+										</label>
+										<ErrorMessage
+											name='metrology'
+											component='div'
+											className='error-message'
+										/>
+										<Field as='select' name='metrology' className='form__input'>
+											<option value=''>Выбрать</option>
+											<option value='Да'>Да</option>
+											<option value='Нет'>Нет</option>
+										</Field>
+									</div>
 								</div>
+
+								<h2>Важные для меня темы к обсуждению в рамках Конференции:</h2>
 
 								{checkboxes.map((item, key) => {
 									return (
@@ -518,22 +527,22 @@ const FormikForm = () => {
 												className='form__checkbox_field'
 												type='checkbox'
 												name='selectedItems'
-												value={item.value}
-												checked={values.selectedItems.includes(item.value)}
+												value={item.text}
+												checked={values.selectedItems.includes(item.text)}
 												onChange={() => {
-													if (values.selectedItems.includes(item.value)) {
+													if (values.selectedItems.includes(item.text)) {
 														// Убрать элемент из массива, если выбран
 														setFieldValue(
 															'selectedItems',
 															values.selectedItems.filter(
-																it => it !== item.value
+																it => it !== item.text
 															)
 														)
 													} else {
 														// Добавить элемент в массив, если не выбран
 														setFieldValue('selectedItems', [
 															...values.selectedItems,
-															item.value,
+															item.text,
 														])
 													}
 													console.log(values.selectedItems)
@@ -544,7 +553,10 @@ const FormikForm = () => {
 									)
 								})}
 
-								<div className='form__checkbox'>
+								<div
+									className='form__checkbox'
+									style={{ fontSize: '14px', marginTop: '30px' }}
+								>
 									<ErrorMessage
 										name='policy'
 										component='div'
@@ -559,10 +571,17 @@ const FormikForm = () => {
 									<div className='form__checkbox_text'>
 										Я ознакомился и согласен с{' '}
 										<a
-											href='https://172.16.0.168/api/fetchPolicy'
+											href={`https://rttec.ru/upload/files-pdf/privacy.pdf`}
 											target='_blank'
 										>
-											политикой безопасности
+											Политикой Конфиденциальности
+										</a>{' '}
+										и{' '}
+										<a
+											href={`https://rttec.ru/upload/files-pdf/agreement.pdf`}
+											target='_blank'
+										>
+											Пользовательским соглашением
 										</a>
 									</div>
 								</div>
@@ -570,6 +589,18 @@ const FormikForm = () => {
 								<button type='submit' name='button' className='form__submit'>
 									Подать заявку
 								</button>
+
+								<div
+									style={{
+										marginTop: '10px',
+										fontSize: '12px',
+										textAlign: 'center',
+									}}
+								>
+									Контактное лицо по вопросам работы сайта:
+									m.afanasyeva@rt-techpriemka.ru и
+									d.kondratenko@rt-techpriemka.ru
+								</div>
 							</Form>
 						)}
 					</Formik>

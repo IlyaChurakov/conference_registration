@@ -11,7 +11,7 @@ function App() {
 			<Route path={'/'} element={<Main />} />
 			<Route path={'/formik'} element={<FormikForm />} />
 			<Route path={'/thanks/:email/:pdfName'} element={<Thanks />} />
-			<Route path={'/error'} element={<ErrorPage />} />
+			<Route path={'/error/:text'} element={<ErrorPage />} />
 
 			<Route path={'*'} element={<div>Страница не найдена 404</div>} />
 		</Routes>

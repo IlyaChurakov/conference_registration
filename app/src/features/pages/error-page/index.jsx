@@ -1,11 +1,13 @@
 import React, { memo } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import './style.scss'
 
 const ErrorPage = props => {
+	const { text } = useParams()
+
 	return (
 		<div className='error'>
-			<p className='error__text'>{props.error}</p>
+			<p className='error__text'>{text}</p>
 			<Link to={'/'} className='error__link'>
 				Вернуться на главную
 			</Link>

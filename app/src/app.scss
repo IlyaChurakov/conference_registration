@@ -1,3 +1,5 @@
+@import url('./fonts/stylesheet.scss');
+
 body {
 	margin: 0;
 	background-color: #767676;
@@ -9,8 +11,7 @@ body {
 }
 
 * {
-	font-family: 'Nunito Sans', sans-serif;
-	font-family: 'Roboto', sans-serif;
+	font-family: 'Proxima Nova Condensed Regular';
 }
 
 .loader {
