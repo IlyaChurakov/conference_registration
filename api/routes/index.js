@@ -160,11 +160,12 @@ router.post('/database', (req, res) => {
 
 	try {
 		db.all(
-			`INSERT INTO qr_visitors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP) on conflict do nothing`,
+			`INSERT INTO qr_visitors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP) `,
 			[name, fio, text, post, phone, email, format, role, theme, options],
 			(err, rows) => {
 				if (err) {
-					res.status(500).send('Ошибка сервера, данные в БД не записаны')
+					console.log(err)
+					res.status(504).send('Данные не уникальны')
 				} else {
 					res.status(200).send(rows) // Отправляем обычный текстовый ответ об успешном выполнении здесь
 				}

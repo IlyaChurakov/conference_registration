@@ -210,7 +210,11 @@ const FormikForm = () => {
 			}
 		)
 			.then(res => {
-				return res.json()
+				if (res.status == 504) {
+					return res.text()
+				} else {
+					return res.json()
+				}
 			})
 			.then(() => console.log('Данные успешно занесены в БД'))
 			.catch(() => {
