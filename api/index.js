@@ -10,6 +10,7 @@ const allowedOrigins = [
 	'http://localhost:5173',
 	'https://localhost',
 	'https://172.16.0.168',
+	'https://reg.rtt.digital',
 ]
 
 app.use(

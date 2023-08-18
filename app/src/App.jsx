@@ -9,7 +9,7 @@ function App() {
 	return (
 		<Routes>
 			<Route path={'/'} element={<Main />} />
-			<Route path={'/formik'} element={<FormikForm />} />
+			<Route path={'/form'} element={<FormikForm />} />
 			<Route path={'/thanks/:email/:pdfName'} element={<Thanks />} />
 			<Route path={'/error/:text'} element={<ErrorPage />} />
 

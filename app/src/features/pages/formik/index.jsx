@@ -571,14 +571,18 @@ const FormikForm = () => {
 									<div className='form__checkbox_text'>
 										Я ознакомился и согласен с{' '}
 										<a
-											href={`https://rttec.ru/upload/files-pdf/privacy.pdf`}
+											href={`${import.meta.env.VITE_SERVER_PROTOCOL}://${
+												import.meta.env.VITE_SERVER_URL
+											}:${import.meta.env.VITE_SERVER_PORT}/api/fetchPrivacy`}
 											target='_blank'
 										>
 											Политикой Конфиденциальности
 										</a>{' '}
 										и{' '}
 										<a
-											href={`https://rttec.ru/upload/files-pdf/agreement.pdf`}
+											href={`${import.meta.env.VITE_SERVER_PROTOCOL}://${
+												import.meta.env.VITE_SERVER_URL
+											}:${import.meta.env.VITE_SERVER_PORT}/api/fetchAgreement`}
 											target='_blank'
 										>
 											Пользовательским соглашением

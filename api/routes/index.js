@@ -87,10 +87,14 @@ router.post('/createPDF', authMiddleware, (req, res) => {
 			width: 250,
 			height: 20,
 		})
+		.text(`Государственной корпорации «Ростех»`, {
+			width: 250,
+			height: 20,
+		})
 		.fontSize(10)
 		.moveDown(0.5)
 		.text(
-			`Содействие развитию систем управления качеством, метрологии и стандартизации организаций промышленности Государственной корпорации «Ростех»`,
+			`Содействие развитию систем управления качеством, метрологии и стандартизации организаций промышленности`,
 			{
 				width: 250,
 				height: 50,
@@ -114,11 +118,23 @@ router.post('/createPDF', authMiddleware, (req, res) => {
 	options && options.length && doc.text(`Интересные темы:`)
 
 	options &&
+		options.length &&
 		options.forEach(opt => {
-			doc.fontSize(8).text(`- ${opt.slice(0, 90)}...`, {
-				width: 380,
-				height: 50,
-			})
+			doc
+				.fontSize(8)
+				.text(
+					`- ${
+						options.length >= 10
+							? opt.length >= 90
+								? opt.slice(0, 90) + '...'
+								: opt
+							: opt
+					}`,
+					{
+						width: 380,
+						height: 50,
+					}
+				)
 		})
 
 	doc.end()
@@ -133,8 +149,12 @@ router.get('/fetchPDF/:pdfName', authMiddleware, (req, res) => {
 
 	res.sendFile(`${__dirname}/${pdfName}`)
 })
-router.get('/fetchPolicy', (req, res) => {
-	const filePath = path.join(__dirname, '..', 'documents', 'Policy.pdf')
+router.get('/fetchPrivacy', (req, res) => {
+	const filePath = path.join(__dirname, '..', 'documents', 'privacy.pdf')
+	res.sendFile(filePath)
+})
+router.get('/fetchAgreement', (req, res) => {
+	const filePath = path.join(__dirname, '..', 'documents', 'agreement.pdf')
 	res.sendFile(filePath)
 })
 
@@ -187,15 +207,38 @@ router.post('/sendemail', authMiddleware, (req, res) => {
 	})
 })
 router.post('/database', authMiddleware, (req, res) => {
-	const { name, fio, post, phone, email, format, role, theme, options, text } =
-		req.body
+	const {
+		name,
+		fio,
+		post,
+		phone,
+		email,
+		format,
+		role,
+		theme,
+		options,
+		text,
+		metrology,
+	} = req.body
 
 	const db = new sqlite3.Database('./ex_visitors.db')
 
 	try {
 		db.all(
-			`INSERT INTO qr_visitors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP) `,
-			[name, fio, text, post, phone, email, format, role, theme, options],
+			`INSERT INTO qr_visitors VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP) `,
+			[
+				name,
+				fio,
+				text,
+				post,
+				phone,
+				email,
+				format,
+				role,
+				theme,
+				options,
+				metrology,
+			],
 			(err, rows) => {
 				if (err) {
 					console.log(err)

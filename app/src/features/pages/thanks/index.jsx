@@ -54,7 +54,7 @@ const Thanks = () => {
 					>
 						Скачать заявку
 					</Link>
-					<Link to={'/formik'} className='thanks__window_link_item'>
+					<Link to={'/form'} className='thanks__window_link_item'>
 						Подать еще одну заявку
 					</Link>
 				</div>

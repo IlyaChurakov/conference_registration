@@ -10,7 +10,7 @@ const Main = () => {
 		<div className='main'>
 			<ReactSVG src={rostech_logo} className='main__logo_rostech' />
 			<ReactSVG src={rttech_logo} className='main__logo_rttech' />
-			<Link className='main__link' to={'/formik'}>
+			<Link className='main__link' to={'/form'}>
 				Заполнить форму
 			</Link>
 			<div className='main__text'>

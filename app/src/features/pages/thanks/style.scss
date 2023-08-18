@@ -1,6 +1,5 @@
 .thanks {
 	height: 100vh;
-
 	background-image: url('../main/img/background.jpg');
 	background-position: center;
 	background-size: cover;
@@ -50,6 +49,21 @@
 				&:hover {
 					color: #005cc8;
 					background-color: transparent;
+				}
+			}
+		}
+	}
+}
+
+@media (max-width: 576px) {
+	.thanks {
+		&__window {
+			width: 300px;
+			&_link {
+				height: 46px;
+				&_item {
+					font-size: 14px;
+					padding: 4px;
 				}
 			}
 		}
