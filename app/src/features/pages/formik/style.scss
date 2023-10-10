@@ -52,10 +52,17 @@
 	}
 	&__checkbox {
 		margin: 10px 0;
-		display: flex;
+		display: grid;
+		grid-template-columns: 20px 1fr;
+		column-gap: 10px;
 		align-items: center;
+		justify-content: start;
 		&_field {
 			margin-right: 10px;
+			width: 100%;
+		}
+		&_text {
+			cursor: pointer;
 		}
 	}
 	&__input {

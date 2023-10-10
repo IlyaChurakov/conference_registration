@@ -8,6 +8,8 @@ const app = express()
 
 const allowedOrigins = [
 	'http://localhost:5173',
+	'http://localhost:5174',
+	'http://localhost:3000',
 	'https://localhost',
 	'https://172.16.0.168',
 	'https://reg.rtt.digital',

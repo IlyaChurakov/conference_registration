@@ -1,15 +1,16 @@
 import React, { memo } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import './style.scss'
 
 const ErrorPage = props => {
 	const { text } = useParams()
+	const navigate = useNavigate()
 
 	return (
 		<div className='error'>
 			<p className='error__text'>{text}</p>
-			<Link to={'/'} className='error__link'>
-				Вернуться на главную
+			<Link to={'#'} onClick={() => navigate(-1)} className='error__link'>
+				Вернуться назад
 			</Link>
 		</div>
 	)

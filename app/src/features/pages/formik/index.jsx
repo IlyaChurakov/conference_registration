@@ -216,6 +216,7 @@ const FormikForm = () => {
 			.then(res => {
 				if (res.status >= 200 && res.status <= 226) {
 					console.log('Данные занесены в базу')
+					console.log(data)
 					return res.text()
 				} else {
 					throw new Error(`${res.status}: ${res.statusText}`)
@@ -363,7 +364,9 @@ const FormikForm = () => {
 									управления качеством, метрологии и стандартизации организаций
 									промышленности»
 								</h2>
-								<h3>10-13 октября 2023 года, г. Сочи</h3>
+								<h3>
+									10-13 октября 2023 года, г. Сочи, Санаторий «Зеленая Роща»
+								</h3>
 								<div className='form__input_wrapper'>
 									<div>
 										<label htmlFor='name' className='form__label'>
@@ -548,7 +551,29 @@ const FormikForm = () => {
 													console.log(values.selectedItems)
 												}}
 											/>
-											<div className='form__checkbox_text'>{item.text}</div>
+											<div
+												className='form__checkbox_text'
+												onClick={() => {
+													if (values.selectedItems.includes(item.text)) {
+														// Убрать элемент из массива, если выбран
+														setFieldValue(
+															'selectedItems',
+															values.selectedItems.filter(
+																it => it !== item.text
+															)
+														)
+													} else {
+														// Добавить элемент в массив, если не выбран
+														setFieldValue('selectedItems', [
+															...values.selectedItems,
+															item.text,
+														])
+													}
+													console.log(values.selectedItems)
+												}}
+											>
+												{item.text}
+											</div>
 										</div>
 									)
 								})}
@@ -591,7 +616,7 @@ const FormikForm = () => {
 								</div>
 
 								<button type='submit' name='button' className='form__submit'>
-									Подать заявку
+									Зарегистрироваться
 								</button>
 
 								<div

@@ -11,12 +11,15 @@ const Main = () => {
 			<ReactSVG src={rostech_logo} className='main__logo_rostech' />
 			<ReactSVG src={rttech_logo} className='main__logo_rttech' />
 			<Link className='main__link' to={'/form'}>
-				Заполнить форму
+				Заполнить форму участника
 			</Link>
 			<div className='main__text'>
 				Конференция Государственной корпорации «Ростех» <br /> «Содействие
 				развитию систем управления качеством, метрологии и стандартизации
 				организаций промышленности»
+			</div>
+			<div className='main__text_descr'>
+				10-13 октября 2023 года, г. Сочи, Санаторий «Зеленая Роща»
 			</div>
 		</div>
 	)

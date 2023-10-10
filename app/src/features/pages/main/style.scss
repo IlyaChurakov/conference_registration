@@ -31,6 +31,14 @@
 		position: fixed;
 		top: 160px;
 		left: 30px;
+		&_descr {
+			color: #fff;
+			width: 700px;
+			position: fixed;
+			font-size: 20px;
+			top: 280px;
+			left: 30px;
+		}
 	}
 	&__logo {
 		&_rostech {
@@ -59,6 +67,11 @@
 			left: 50%;
 			text-align: center;
 			transform: translateX(-50%);
+			&_descr {
+				left: 50%;
+				text-align: center;
+				transform: translateX(-50%);
+			}
 		}
 		&__logo {
 			&_rttech {
@@ -74,6 +87,10 @@
 		&__text {
 			font-size: 24px;
 			width: 550px;
+			&_descr {
+				font-size: 18px;
+				width: 550px;
+			}
 		}
 		&__logo {
 			&_rttech {
@@ -93,6 +110,10 @@
 		&__text {
 			font-size: 18px;
 			width: 310px;
+			&_descr {
+				font-size: 16px;
+				width: 310px;
+			}
 		}
 		&__logo {
 			&_rostech {
