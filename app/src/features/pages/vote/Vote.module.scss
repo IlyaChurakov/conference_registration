@@ -14,10 +14,10 @@
 	align-items: center;
 	padding: 20px;
 	height: 100vh;
-	overflow-y: auto;
+	/* overflow-y: auto; */
 	width: 100%;
 	position: relative;
-	max-width: 500px;
+	max-width: 900px;
 	box-sizing: border-box;
 }
 
@@ -80,8 +80,50 @@
 	width: 100%;
 	box-sizing: border-box;
 	padding: 20px 30px 30px 30px;
-	display: grid;
-	grid-template-rows: 60px 1fr 50px;
+	overflow-y: auto;
+	&::-webkit-scrollbar {
+		display: none;
+	}
+	label {
+		margin: 10px 0 5px;
+	}
+	select {
+		border: 2px solid #005cc8;
+		border-radius: 5px;
+		background-color: transparent;
+		color: #005cc8;
+		outline: none;
+		height: 50px;
+		&::placeholder {
+			color: #005dc894;
+		}
+	}
+	textarea {
+		border: 2px solid #005cc8;
+		border-radius: 5px;
+		background-color: transparent;
+		color: #005cc8;
+		outline: none;
+		height: 50px;
+		resize: none;
+	}
+
+	button {
+		margin-top: 20px;
+		height: 40px;
+		border-radius: 5px;
+		border: 2px solid #005cc8;
+		background-color: #005cc8;
+		color: #fff;
+		&:hover {
+			background-color: #fff;
+			color: #005cc8;
+		}
+	}
+	> div {
+		display: flex;
+		flex-direction: column;
+	}
 	h1 {
 		text-align: center;
 		font-size: 20px;
@@ -91,7 +133,7 @@
 		}
 	}
 	h2 {
-		margin-top: 0px;
+		margin: 20px 0 0 0;
 		text-align: center;
 		font-size: 16px;
 	}

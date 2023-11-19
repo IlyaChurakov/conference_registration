@@ -278,14 +278,50 @@ router.get('/database', authMiddleware, (req, res) => {
 	db.close()
 })
 router.post('/rate', authMiddleware, (req, res) => {
-	const { message, rating } = req.body
+	const {
+		industry,
+		age,
+		post,
+		format,
+		conferenceFeedback,
+		conferenceFeedbackRating,
+		qualityAndRelevance,
+		qualityAndRelevanceRating,
+		interestingPresentations,
+		inspiringMoments,
+		organizationalCommitteeEfforts,
+		organizationalCommitteeEffortsRating,
+		organizationAspects,
+		specificImpressions,
+		impactOnDevelopment,
+		suggestions,
+		other,
+	} = req.body
 
 	const db = new sqlite3.Database('./ex_visitors.db')
 
 	try {
 		db.all(
-			`INSERT INTO rating VALUES (CURRENT_TIMESTAMP, ?, ?) `,
-			[message, rating],
+			`INSERT INTO rating VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) `,
+			[
+				industry,
+				age,
+				post,
+				format,
+				conferenceFeedback,
+				conferenceFeedbackRating,
+				qualityAndRelevance,
+				qualityAndRelevanceRating,
+				interestingPresentations,
+				inspiringMoments,
+				organizationalCommitteeEfforts,
+				organizationalCommitteeEffortsRating,
+				organizationAspects,
+				specificImpressions,
+				impactOnDevelopment,
+				suggestions,
+				other,
+			],
 			(err, rows) => {
 				if (err) {
 					console.log(err)
@@ -296,6 +332,7 @@ router.post('/rate', authMiddleware, (req, res) => {
 			}
 		)
 	} catch (err) {
+		console.log(err)
 		res.status(500).send('Ошибка сервера, данные в БД не записаны')
 	}
 

@@ -11,13 +11,13 @@ const StarRating = ({ field, form }) => {
 
 	return (
 		<div className={styles.rating}>
-			<label
+			{/* <label
 				htmlFor='rating'
 				className='form__label'
 				style={{ marginRight: '10px' }}
 			>
 				Поставьте оценку
-			</label>
+			</label> */}
 			{[1, 2, 3, 4, 5].map(rating => (
 				<label key={rating}>
 					<input
