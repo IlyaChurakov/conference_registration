@@ -1,6 +1,7 @@
 version: '3'
 services:
   app:
+    platform: linux/amd64
     container_name: conf_app
     restart: always
     build: ./app
@@ -9,6 +10,7 @@ services:
       - 80:80
       - 443:443
   api:
+    platform: linux/amd64
     container_name: conf_api
     restart: always
     build: ./api
@@ -16,4 +18,4 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./db/ex_visitors.db:/app/ex_visitors.db
+      - ./db/new_visitors.db:/app/new_visitors.db

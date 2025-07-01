@@ -301,7 +301,7 @@ const FormikForm = () => {
 		policy: Yup.string().required('Невозможно продолжить без согласия'),
 		name: Yup.string().required('Введите название организации'),
 		fio: Yup.string()
-			.matches(/^[A-Za-zА-Яа-я\s'-]+$/, 'Недопустимые символы')
+			.matches(/^[A-Za-zА-Яа-яёЁ\s'-]+$/, 'Недопустимые символы')
 			.test(
 				'doubleSpaces',
 				'Введите полное ФИО',
@@ -320,7 +320,6 @@ const FormikForm = () => {
 			.required('Введите номер телефона'),
 		format: Yup.string().required('Выберите формат участия'),
 		role: Yup.string().required('Выберите роль участника'),
-		metrology: Yup.string().required('Укажите участие'),
 	})
 
 	return (
@@ -340,6 +339,7 @@ const FormikForm = () => {
 					<Formik
 						initialValues={{
 							name: '',
+							incontur: false,
 							fio: '',
 							post: '',
 							phone: '',
@@ -349,7 +349,6 @@ const FormikForm = () => {
 							theme: '',
 							selectedItems: [],
 							policy: false,
-							metrology: '',
 						}}
 						validationSchema={validationSchema}
 						onSubmit={async values => {
@@ -365,8 +364,9 @@ const FormikForm = () => {
 									промышленности»
 								</h2>
 								<h3>
-									10-13 октября 2023 года, г. Сочи, Санаторий «Зеленая Роща»
+									20 — 22 ноября 2024 года, г. Москва, Бизнес-парк «Ростех-сити»
 								</h3>
+								
 								<div className='form__input_wrapper'>
 									<div>
 										<label htmlFor='name' className='form__label'>
@@ -383,6 +383,19 @@ const FormikForm = () => {
 											placeholder='АО РТ-Техприемка'
 											className='form__input'
 										/>
+									</div>
+
+									<div style={{display: 'flex'}}>
+										<Field
+											id='incontur'
+											name='incontur'
+											className='form__input'
+											type='checkbox'
+											style={{width: '20px', height: '20px', marginLeft: '10px'}}
+										/>
+										<label htmlFor='incontur' className='form__label'>
+											Входит в контур Государственной корпорации «Ростех»
+										</label>
 									</div>
 
 									<div>
@@ -502,23 +515,6 @@ const FormikForm = () => {
 											/>
 										</div>
 									)}
-
-									<div style={{ gridColumn: '1 / 3' }}>
-										<label htmlFor='metrology' className='form__label'>
-											Участие в Совете главных метрологов организаций ГК
-											«Ростех»
-										</label>
-										<ErrorMessage
-											name='metrology'
-											component='div'
-											className='error-message'
-										/>
-										<Field as='select' name='metrology' className='form__input'>
-											<option value=''>Выбрать</option>
-											<option value='Да'>Да</option>
-											<option value='Нет'>Нет</option>
-										</Field>
-									</div>
 								</div>
 
 								<h2>Важные для меня темы к обсуждению в рамках Конференции:</h2>

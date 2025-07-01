@@ -167,6 +167,11 @@ router.get('/fetchAgreement', (req, res) => {
 	res.sendFile(filePath)
 })
 
+router.get('/reminder', (req, res) => {
+	const filePath = path.join(__dirname, '..', 'documents', 'ПамяткаУчастника.pdf')
+	res.sendFile(filePath)
+})
+
 router.post('/sendemail', authMiddleware, (req, res) => {
 	const { fio, email, pdfName } = req.body
 	// Настройка транспорта для отправки письма (указать свои настройки SMTP)
@@ -196,10 +201,10 @@ router.post('/sendemail', authMiddleware, (req, res) => {
 			<div>
 				<div>Здравствуйте, ${fio}!</div>
 				<p>Спасибо за регистрацию на конференцию Государственной корпорации «Ростех» «Содействие развитию систем управления качеством, метрологии и стандартизации организаций промышленности».</p>
-				<p>Мы будем рады видеть Вас <strong> 10-13 октября 2023 года </strong> в городе <strong>Сочи, Санаторий «Зеленая Роща»</strong>.</p>
+				<p>Мы будем рады видеть Вас <strong> 20-22 ноября 2024 года в г. Москва, Бизнес-парк «Ростех-Сити»</strong>.</p>
 				<p>За несколько дней до конференции Вам придет письмо с напоминанием.</p>
 				<p>Пожалуйста, не забудьте приглашение, вложенное в письмо. Его можно не распечатывать, а сохранить в телефоне: оно понадобится для оформления бейджа участника.</p>
-				<p>Не прощаемся и ждем Вас в Сочи!</p>
+				<p>Не прощаемся и ждем Вас в Москве!</p>
 				<p><i>АО «РТ-Техприемка»</i></p>
 			</div>`,
 	}
@@ -227,10 +232,12 @@ router.post('/database', authMiddleware, (req, res) => {
 		theme,
 		options,
 		text,
-		metrology,
+		incontur,
 	} = req.body
 
-	const db = new sqlite3.Database('./ex_visitors.db')
+	console.log(req.body)
+
+	const db = new sqlite3.Database('./new_visitors.db')
 
 	try {
 		db.all(
@@ -246,7 +253,7 @@ router.post('/database', authMiddleware, (req, res) => {
 				role,
 				theme,
 				JSON.stringify(options),
-				metrology,
+				incontur,
 			],
 			(err, rows) => {
 				if (err) {
@@ -264,7 +271,7 @@ router.post('/database', authMiddleware, (req, res) => {
 	db.close()
 })
 router.get('/database', authMiddleware, (req, res) => {
-	const db = new sqlite3.Database('./ex_visitors.db')
+	const db = new sqlite3.Database('./new_visitors.db')
 
 	db.all(`select * from qr_visitors v`, (err, rows) => {
 		if (err) {
@@ -298,7 +305,7 @@ router.post('/rate', authMiddleware, (req, res) => {
 		other,
 	} = req.body
 
-	const db = new sqlite3.Database('./ex_visitors.db')
+	const db = new sqlite3.Database('./new_visitors.db')
 
 	try {
 		db.all(
@@ -321,6 +328,36 @@ router.post('/rate', authMiddleware, (req, res) => {
 				impactOnDevelopment,
 				suggestions,
 				other,
+			],
+			(err, rows) => {
+				if (err) {
+					console.log(err)
+					res.status(504).send('Данные не уникальны')
+				} else {
+					res.status(200).send(rows) // Отправляем обычный текстовый ответ об успешном выполнении здесь
+				}
+			}
+		)
+	} catch (err) {
+		console.log(err)
+		res.status(500).send('Ошибка сервера, данные в БД не записаны')
+	}
+
+	db.close()
+})
+router.post('/feedback', authMiddleware, (req, res) => {
+	const {
+		message, rating
+	} = req.body
+
+	const db = new sqlite3.Database('./new_visitors.db')
+	
+	try {
+		db.all(
+			`INSERT INTO feedback VALUES (CURRENT_TIMESTAMP, ?, ?) `,
+			[
+				message,
+				rating
 			],
 			(err, rows) => {
 				if (err) {
