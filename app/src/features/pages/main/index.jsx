@@ -1,26 +1,38 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-// import { ReactSVG } from 'react-svg';
-// import rostech_logo from '../../../icons/лого ростех.svg';
-// import rttech_logo from '../../../icons/лого рт тех.svg';
-import './style.scss';
+import styles from './styles.module.scss';
+import rostecLogo from './img/rostec.svg';
+import rttecLogo from './img/rttec.svg';
+import { ReactSVG } from 'react-svg';
 
 const Main = () => {
   return (
-    <div className="main">
-      {/* <ReactSVG src={rostech_logo} className='main__logo_rostech' />
-			<ReactSVG src={rttech_logo} className='main__logo_rttech' /> */}
-      <Link className="main__link" to={'/form'}>
+    <div className={styles.main}>
+      <div className={styles.logo}>
+        <ReactSVG src={rostecLogo} />
+        <ReactSVG src={rttecLogo} />
+      </div>
+
+      <div className={styles.descr}>
+        ФОРУМ «АО «РТ-ТЕХПРИЕМКА» -{' '}
+        <div className={styles.descr_title}>85 ЛЕТ НА СЛУЖБЕ ОТЕЧЕСТВУ»</div>
+        <br />
+        <br />
+        <div className={styles.descr_subtitle}>
+          г. Москва, Бизнес-парк «Ростех-сити»
+        </div>
+      </div>
+
+      <div className={styles.title}>
+        КАЧЕСТВО
+        <div className={styles.title_subtitle}>РАСШИРЯЯ ГРАНИЦЫ</div>
+      </div>
+
+      <Link className={styles.link} to={'/form'}>
         Заполнить форму участника
       </Link>
-      <div className="main__text">
-        Конференция Государственной корпорации «Ростех» <br /> «Содействие
-        развитию систем управления качеством, метрологии и стандартизации
-        организаций промышленности»
-      </div>
-      <div className="main__text_descr">
-        20 — 22 ноября 2024 года, г. Москва, Бизнес-парк «Ростех-сити»
-      </div>
+
+      <div className={styles.dates}>23 – 26 сентября 2025</div>
     </div>
   );
 };

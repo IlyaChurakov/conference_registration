@@ -1,18 +1,19 @@
-import React, { memo } from 'react'
-import './style.scss'
+import { useField } from 'formik';
+import ReactSelect from 'react-select';
 
-const Select = ({ onChange, options, style, value }) => {
-	return (
-		<select className='select' style={style} value={value} onChange={onChange}>
-			{options.map((item, key) => {
-				return (
-					<option key={key} value={item.value}>
-						{item.text}
-					</option>
-				)
-			})}
-		</select>
-	)
-}
+const Select = (props) => {
+  const [field, , helpers] = useField(props);
 
-export default memo(Select)
+  return (
+    <ReactSelect
+      {...props}
+      placeholder="Выбрать"
+      className="basic-multi-select"
+      classNamePrefix="select"
+      onChange={(selectedOption) => helpers.setValue(selectedOption.value)}
+      value={props.options.filter((opt) => opt.value === field.value)}
+    />
+  );
+};
+
+export default Select;
