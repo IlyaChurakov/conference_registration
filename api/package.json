@@ -1,26 +1,27 @@
 {
-	"scripts": {
-		"dev": "nodemon index.js"
-	},
-	"dependencies": {
-		"body-parser": "^1.20.2",
-		"concurrently": "^8.2.0",
-		"cors": "^2.8.5",
-		"crypto": "^1.0.1",
-		"dotenv": "^16.3.1",
-		"express": "^4.18.2",
-		"file-saver": "^2.0.5",
-		"html-pdf": "^3.0.1",
-		"jquery": "^3.7.0",
-		"jsonwebtoken": "^9.0.1",
-		"nodemailer": "^6.9.4",
-		"pdfkit": "^0.13.0",
-		"puppeteer": "^21.0.3",
-		"qrcode": "^1.5.3",
-		"sqlite3": "^5.1.6",
-		"uuid": "^9.0.1"
-	},
-	"devDependencies": {
-		"nodemon": "^3.0.1"
-	}
+  "scripts": {
+    "dev": "nodemon index.js",
+    "build-tar": "docker buildx build --platform=linux/amd64 -t conf_api:latest -o type=docker,dest=- . > conf_api.tar"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "concurrently": "^8.2.0",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "file-saver": "^2.0.5",
+    "html-pdf": "^3.0.1",
+    "jquery": "^3.7.0",
+    "jsonwebtoken": "^9.0.1",
+    "nodemailer": "^6.9.4",
+    "pdfkit": "^0.13.0",
+    "puppeteer": "^21.0.3",
+    "qrcode": "^1.5.3",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
 }
